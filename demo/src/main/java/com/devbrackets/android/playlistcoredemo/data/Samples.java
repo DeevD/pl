@@ -15,7 +15,6 @@ public class Samples {
 
     static {
         String audioImage = "https://ia902708.us.archive.org/3/items/count_monte_cristo_0711_librivox/Count_Monte_Cristo_1110.jpg?cnt=0";
-
         /* AUDIO
          * These items are licensed under CreativeCommons from LibriVox
          * Additional files can be found at https://archive.org/details/count_monte_cristo_0711_librivox

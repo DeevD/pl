@@ -6,6 +6,7 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.MediaRouteButton;
 import android.text.format.DateUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -25,6 +26,7 @@ import com.devbrackets.android.playlistcoredemo.R;
 import com.devbrackets.android.playlistcoredemo.data.MediaItem;
 import com.devbrackets.android.playlistcoredemo.data.Samples;
 import com.devbrackets.android.playlistcoredemo.manager.PlaylistManager;
+import com.devbrackets.android.playlistcoredemo.utils.SongHelper;
 import com.google.android.gms.cast.framework.CastButtonFactory;
 
 import java.util.Formatter;
@@ -38,7 +40,13 @@ import java.util.Locale;
  * and {@link com.devbrackets.android.playlistcore.manager.ListPlaylistManager}
  * classes.
  */
-public class AudioPlayerActivity extends AppCompatActivity implements PlaylistListener<MediaItem>, ProgressListener {
+public class AudioPlayerActivity extends
+        AppCompatActivity
+        implements PlaylistListener<MediaItem>,
+        ProgressListener {
+
+    private SongHelper songHelper;
+
     public static final String EXTRA_INDEX = "EXTRA_INDEX";
     public static final int PLAYLIST_ID = 4; //Arbitrary, for the example
 
@@ -155,7 +163,7 @@ public class AudioPlayerActivity extends AppCompatActivity implements PlaylistLi
 
         if (!userInteracting) {
             seekBar.setSecondaryProgress((int) (progress.getDuration() * progress.getBufferPercentFloat()));
-            seekBar.setProgress((int)progress.getPosition());
+            seekBar.setProgress((int) progress.getPosition());
             currentPositionView.setText(formatMs(progress.getPosition()));
         }
 
@@ -198,7 +206,7 @@ public class AudioPlayerActivity extends AppCompatActivity implements PlaylistLi
     private void init() {
         retrieveViews();
         setupListeners();
-
+        songHelper = new SongHelper(this);
         glide = Glide.with(this);
         CastButtonFactory.setUpMediaRouteButton(getApplicationContext(), castButton);
 
@@ -236,7 +244,7 @@ public class AudioPlayerActivity extends AppCompatActivity implements PlaylistLi
     public void loadCompleted() {
         playPauseButton.setVisibility(View.VISIBLE);
         previousButton.setVisibility(View.VISIBLE);
-        nextButton.setVisibility(View.VISIBLE );
+        nextButton.setVisibility(View.VISIBLE);
 
         loadingBar.setVisibility(View.INVISIBLE);
     }
@@ -248,7 +256,7 @@ public class AudioPlayerActivity extends AppCompatActivity implements PlaylistLi
     public void restartLoading() {
         playPauseButton.setVisibility(View.INVISIBLE);
         previousButton.setVisibility(View.INVISIBLE);
-        nextButton.setVisibility(View.INVISIBLE );
+        nextButton.setVisibility(View.INVISIBLE);
 
         loadingBar.setVisibility(View.VISIBLE);
     }
@@ -259,7 +267,7 @@ public class AudioPlayerActivity extends AppCompatActivity implements PlaylistLi
      * @param duration The duration of the media item in milliseconds
      */
     private void setDuration(long duration) {
-        seekBar.setMax((int)duration);
+        seekBar.setMax((int) duration);
         durationView.setText(formatMs(duration));
     }
 
@@ -278,14 +286,18 @@ public class AudioPlayerActivity extends AppCompatActivity implements PlaylistLi
         }
 
         List<MediaItem> mediaItems = new LinkedList<>();
-        for (Samples.Sample sample : Samples.getAudioSamples()) {
+
+        for (String title : songHelper.getAlbum(2)) {
+            Log.i("getArtist Song Title", "artist songs " + title.toString());
+
+        }
+        for (Samples.Sample sample : songHelper.listOfSongs(this)) {
             MediaItem mediaItem = new MediaItem(sample, true);
             mediaItems.add(mediaItem);
         }
 
         playlistManager.setParameters(mediaItems, selectedPosition);
         playlistManager.setId(PLAYLIST_ID);
-
         return true;
     }
 
